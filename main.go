@@ -3,20 +3,36 @@ package main
 import (
 	"fmt"
 	"runtime"
-	"sync"
+	// "sync"
+	// "time"
 )
 
 func main() {
-	var wg sync.WaitGroup
-	// カウンタを1つ加算
-	wg.Add(1)
+	// 	ch := make(chan int)
+	// 	var wg sync.WaitGroup
+	// 	wg.Add(1)
+	// 	go func() {
+	// 		defer wg.Done()
+	// 		ch <- 10
+	// 		time.Sleep(500 * time.Millisecond)
+	// 	}()
+	// 	fmt.Println(<-ch)
+	// 	wg.Wait()
+
+	ch1 := make(chan int)
 	go func() {
-		// カウンタを1つ減算
-		defer wg.Done()
-		fmt.Println("goroutine invoked")
+		// 読み込み操作を行なっているが、書き込みがないので、ずっと待機している
+		fmt.Println(<-ch1)
 	}()
-	wg.Wait()
-	// 起動しているゴルーチンの数を取得する
+	// 書き込みを追加してみる
+	ch1 <- 10
 	fmt.Printf("num of working goroutines: %d\n", runtime.NumGoroutine())
-	fmt.Println("main func finish")
+
+	// バッファ付きchannel
+	ch2 := make(chan int, 1)
+	// 書き込み
+	ch2 <- 2
+	ch2 <- 3
+	// 読み込み
+	fmt.Println(<-ch2)
 }
